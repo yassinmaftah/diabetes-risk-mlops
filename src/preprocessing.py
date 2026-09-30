@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-
-
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import KNNImputer
 
 
 def drop_column(df:pd.DataFrame, column:str) -> pd.DataFrame :
@@ -25,7 +25,6 @@ def choose_strategy(df: pd.DataFrame, column: str) -> str:
     return "mean" if abs(skewness) < 0.5 else "median"
 
 def impute_column(df: pd.DataFrame, column: str, strategy: str) -> pd.DataFrame:
-    """Return a copy of the DataFrame where NaN in `column` are filled."""
     if column not in df.columns:
         raise KeyError(f"We don't have this Column [{column}] in our dataset")
     if strategy not in ("mean", "median"):
@@ -39,3 +38,28 @@ def impute_column(df: pd.DataFrame, column: str, strategy: str) -> pd.DataFrame:
 def handle_missing(df: pd.DataFrame, column: str) -> pd.DataFrame:
     strategy = choose_strategy(df, column)
     return impute_column(df, column, strategy)
+
+
+def scale_column(df: pd.DataFrame, columns:list[str]) :
+    for c in columns :
+        if c not in df.columns:
+            raise KeyError(f"We dno't have this column: [{c}]")
+        
+    df = df.copy()
+    scaler = StandardScaler()
+    
+    df[columns] = scaler.fit_transform(df[columns])
+    
+    return df, scaler
+
+def knn(df: pd.DataFrame, columns: list[str], neighbors:int=5) :
+    df_scaled, scaler = scale_column(df,columns)
+    
+    imputer = KNNImputer(n_neighbors=neighbors)
+    
+    df1 = imputer.fit_transform(df_scaled[columns])
+    df_final = scaler.inverse_transform(df1)
+    
+    df= df.copy()
+    df[columns] = df_final
+    return df
