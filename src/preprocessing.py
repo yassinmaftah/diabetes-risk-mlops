@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import KNNImputer
-
+from src.eda import graphe_check_outliers
 
 def drop_column(df:pd.DataFrame, column:str) -> pd.DataFrame :
     if column not in df.columns:
@@ -52,14 +52,35 @@ def scale_column(df: pd.DataFrame, columns:list[str]) :
     
     return df, scaler
 
-def knn(df: pd.DataFrame, columns: list[str], neighbors:int=5) :
-    df_scaled, scaler = scale_column(df,columns)
+def knn(df: pd.DataFrame, columns_z: list[str],others_column ,neighbors:int=5) :
+    
+    all_columns = columns_z + others_column
+    df_scaled, scaler = scale_column(df,all_columns)
     
     imputer = KNNImputer(n_neighbors=neighbors)
-    
-    df1 = imputer.fit_transform(df_scaled[columns])
+    df1 = imputer.fit_transform(df_scaled[all_columns])
     df_final = scaler.inverse_transform(df1)
     
     df= df.copy()
-    df[columns] = df_final
+    df[all_columns] = df_final
+    return df
+
+
+
+# Glucose OK 
+# BloodPressure 3 value less then min 
+# SkinThickness OK
+# Insulin max = 300 and we have 37
+# BMI OK
+# DiabetesPedigreeFunction OK 
+# Age OK 
+
+def cap_column(df: pd.DataFrame, column: str, min_value: float = None, max_value: float = None) -> pd.DataFrame:
+    if column not in df.columns:
+        raise KeyError(f"Column '{column}' not found. Available: {list(df.columns)}")
+    if min_value is None and max_value is None:
+        raise ValueError("Provide at least one of min_value or max_value.")
+
+    df = df.copy()
+    df[column] = df[column].clip(lower=min_value, upper=max_value)
     return df
