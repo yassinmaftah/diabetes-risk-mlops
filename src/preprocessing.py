@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.impute import KNNImputer
-from src.eda import graphe_check_outliers
+
 
 def drop_column(df:pd.DataFrame, column:str) -> pd.DataFrame :
     if column not in df.columns:
@@ -46,6 +44,7 @@ def scale_column(df: pd.DataFrame, columns:list[str]) :
             raise KeyError(f"We dno't have this column: [{c}]")
         
     df = df.copy()
+    from sklearn.preprocessing import StandardScaler
     scaler = StandardScaler()
     
     df[columns] = scaler.fit_transform(df[columns])
@@ -53,7 +52,7 @@ def scale_column(df: pd.DataFrame, columns:list[str]) :
     return df, scaler
 
 def knn(df: pd.DataFrame, columns_z: list[str],others_column ,neighbors:int=5) :
-    
+    from sklearn.impute import KNNImputer
     all_columns = columns_z + others_column
     df_scaled, scaler = scale_column(df,all_columns)
     

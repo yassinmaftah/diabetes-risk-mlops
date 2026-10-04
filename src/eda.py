@@ -1,6 +1,10 @@
 import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+mpl.rcParams['font.sans-serif'] = ['Arial', 'Segoe UI', 'DejaVu Sans']
+mpl.rcParams['font.enable_last_resort'] = False
 
 def column_info(df: pd.DataFrame, column: str) -> pd.DataFrame:
         
@@ -41,7 +45,7 @@ def column_info(df: pd.DataFrame, column: str) -> pd.DataFrame:
     return pd.DataFrame(rows, columns=["Section", "Metric", "Value"])
 
 
-def graphe_check_outliers(df: pd.DataFrame, column: str) -> None:
+def graphe_check_outliers(df: pd.DataFrame, column: str, kde: bool = False) -> None:
     if column not in df.columns:
         raise KeyError(f"We don't have this Column [{column}] in our dataset")
     
@@ -50,7 +54,10 @@ def graphe_check_outliers(df: pd.DataFrame, column: str) -> None:
     sns.boxplot(x=df[column], ax=ax_box, color="lightblue")
     ax_box.set_title("Boxplot (dots = outliers)")
 
-    sns.histplot(df[column], kde=True, ax=ax_hist)
+    try:
+        sns.histplot(df[column], kde=kde, ax=ax_hist)
+    except (ImportError, OSError):
+        sns.histplot(df[column], kde=False, ax=ax_hist)
     ax_hist.set_title("Distribution")
 
     fig.suptitle(column)
