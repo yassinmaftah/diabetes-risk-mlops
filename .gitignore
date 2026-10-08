@@ -219,3 +219,7 @@ __marimo__/
 
 models/*.joblib
 models/*.pkl
+
+
+mlflow.db
+mlruns/
