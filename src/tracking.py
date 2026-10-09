@@ -5,15 +5,23 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
+import hashlib
+import platform
+
+import numpy as np
+import pandas as pd
+import sklearn
 
 import mlflow
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 TRACKING_URI = f"sqlite:///{(PROJECT_ROOT / 'mlflow.db').as_posix()}"
 
+# sqlite:///C:/Users/yassi/Desktop/diabetes-risk-mlops/mlflow.db
+
 def log_clustering_run(kmeans, scaler, features, silhouette, model_path, scaler_path,
-                       experiment_name="diabetes-clustering", run_name="kmeans-k2"):
+                    run_name="kmeans-k2"):
     mlflow.set_tracking_uri(TRACKING_URI)
-    mlflow.set_experiment(experiment_name)
+    mlflow.set_experiment(f"diabetes-clustering")
 
     with mlflow.start_run(run_name=run_name):
         mlflow.log_param("k", kmeans.n_clusters)
@@ -34,9 +42,8 @@ def log_clustering_run(kmeans, scaler, features, silhouette, model_path, scaler_
 def log_classification_run(pipeline, X_test, y_test, params, features, run_name,
                            model_path):
     y_pred = pipeline.predict(X_test)
-
     mlflow.set_tracking_uri(TRACKING_URI)
-    mlflow.set_experiment("diabetes-classification")
+    mlflow.set_experiment(f"diabetes-classification")
 
     with mlflow.start_run(run_name=run_name):
         mlflow.log_params(params)
@@ -53,6 +60,7 @@ def log_classification_run(pipeline, X_test, y_test, params, features, run_name,
         save_confusion_matrix_image(y_test, y_pred, image_path, run_name)
         mlflow.log_artifact(str(image_path))
         
+        log_library_versions()        
     
 def save_confusion_matrix_image(y_test, y_pred, path, title):
     cm = confusion_matrix(y_test, y_pred, labels=[0, 1])
@@ -76,3 +84,13 @@ def save_confusion_matrix_image(y_test, y_pred, path, title):
     fig.tight_layout()
     fig.savefig(path)
     plt.close(fig)
+    
+    
+def log_library_versions():
+    mlflow.log_params({
+        "python_version": platform.python_version(),
+        "sklearn_version": sklearn.__version__,
+        "pandas_version": pd.__version__,
+        "numpy_version": np.__version__,
+        "mlflow_version": mlflow.__version__,
+    })
