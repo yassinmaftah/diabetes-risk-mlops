@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import os
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import matplotlib
 matplotlib.use("Agg")
@@ -14,8 +14,8 @@ import sklearn
 
 import mlflow
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-TRACKING_URI = f"sqlite:///{(PROJECT_ROOT / 'mlflow.db').as_posix()}"
-
+TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI",
+                         f"sqlite:///{(PROJECT_ROOT / 'mlflow.db').as_posix()}")
 # sqlite:///C:/Users/yassi/Desktop/diabetes-risk-mlops/mlflow.db
 
 def log_clustering_run(kmeans, scaler, features, silhouette, model_path, scaler_path,
