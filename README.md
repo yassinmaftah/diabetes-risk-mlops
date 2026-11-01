@@ -412,6 +412,6 @@ The classification pipeline (`StandardScaler` + `LogisticRegression(C=10, solver
 ## Author
 
 - **Author:** [Yassin Maftah](https://github.com/yassinmaftah)
-- **LinkedIn:** [linkedin.com/in/yassin-maftah](https://www.linkedin.com/in/yassin-maftah) *(Placeholder - update with your profile)*
+- **LinkedIn:** [linkedin.com/in/yassin-maftah](https://www.linkedin.com/in/yassine-maftah-b5793933b/) 
 - **GitHub:** [@yassinmaftah](https://github.com/yassinmaftah)
 - **Project Repository:** [https://github.com/yassinmaftah/diabetes-risk-mlops](https://github.com/yassinmaftah/diabetes-risk-mlops)
